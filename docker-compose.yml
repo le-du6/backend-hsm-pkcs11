@@ -1,0 +1,19 @@
+version: '3.9'
+services:
+  api:
+    build: .
+    environment:
+      - NODE_ENV=development
+      - PORT=3000
+      - LOG_LEVEL=info
+      - PKCS11_MODULE_PATH=/usr/lib/softhsm/libsofthsm2.so
+      - PKCS11_TOKEN_LABEL=${PKCS11_TOKEN_LABEL:-HSMDev}
+      - PKCS11_PIN=${PKCS11_PIN:-1234}
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/app
+      - softhsm-data:/var/lib/softhsm
+    command: npm run dev
+volumes:
+  softhsm-data:

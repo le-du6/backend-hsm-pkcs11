@@ -1,0 +1,136 @@
+openapi: 3.1.0
+info:
+  title: HSM PKCS#11 API
+  version: 0.1.0
+servers:
+  - url: http://localhost:3000/api/v1
+paths:
+  /health:
+    get:
+      summary: Health check
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+  /keys:
+    get:
+      summary: Lister les clés
+      responses:
+        '200':
+          description: Liste des clés
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/KeySummary'
+    post:
+      summary: Créer une clé EC P-256
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateKeyRequest'
+      responses:
+        '201':
+          description: Clé créée
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyDetail'
+  /keys/{id}:
+    get:
+      summary: Obtenir une clé
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Détails clé
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KeyDetail'
+        '404': { description: Clé introuvable }
+    delete:
+      summary: Supprimer une clé
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+      responses:
+        '204': { description: Supprimée }
+        '404': { description: Clé introuvable }
+  /sign:
+    post:
+      summary: Signer des données avec une clé EC
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+      responses:
+        '200':
+          description: Signature
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SignResponse'
+components:
+  schemas:
+    CreateKeyRequest:
+      type: object
+      properties:
+        label:
+          type: string
+          description: Label optionnel; généré automatiquement si absent
+        id: { type: string, pattern: '^[0-9a-fA-F]+$' }
+        curve: { type: string, enum: ['P-256'], default: 'P-256' }
+      required: []
+    KeySummary:
+      type: object
+      properties:
+        id: { type: string }
+        label: { type: string }
+        curve: { type: string }
+    KeyDetail:
+      allOf:
+        - $ref: '#/components/schemas/KeySummary'
+        - type: object
+          properties:
+            publicKeyPem: { type: string }
+    SignRequest:
+      type: object
+      properties:
+        id: { type: string }
+        data: { type: string }
+        encoding: { type: string, enum: ['utf8','base64'], default: 'utf8' }
+      required: [id, data]
+    SignResponse:
+      type: object
+      properties:
+        algorithm: { type: string, example: ECDSA }
+        hash: { type: string, example: SHA-256 }
+        hashHex: { type: string }
+        signatureDerBase64: { type: string }
+        signatureRaw:
+          type: object
+          properties:
+            rHex: { type: string }
+            sHex: { type: string }
+            rBase64Url: { type: string }
+            sBase64Url: { type: string }

@@ -1,0 +1,51 @@
+{
+  "name": "backend-hsm-pkcs11",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "API Node.js Express PKCS#11 (SoftHSM, EC P-256, signature ECDSA)",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "tsx watch src/server.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "lint": "eslint 'src/**/*.ts' --max-warnings=0",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "softhsm:init": "bash scripts/softhsm-init.sh",
+    "softhsm:show": "bash scripts/softhsm-show.sh",
+    "env:check": "bash scripts/env-check.sh"
+  },
+  "engines": {
+    "node": ">=18.19.0 <23"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.1.5",
+    "helmet": "^7.0.0",
+    "pino": "^9.0.0",
+    "pkcs11js": "^2.1.6",
+    "zod": "^3.23.8"
+  },
+  "optionalDependencies": {},
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/node": "^20.14.10",
+    "@types/helmet": "^4.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.18.0",
+    "@typescript-eslint/parser": "^7.18.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "prettier": "^3.3.3",
+    "supertest": "^7.0.0",
+    "tsx": "^4.16.2",
+    "typescript": "^5.5.4",
+    "vitest": "^2.0.5"
+  },
+  "rebuild:native": "npm rebuild pkcs11js --build-from-source"
+}
